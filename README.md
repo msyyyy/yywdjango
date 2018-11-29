@@ -1,3 +1,3 @@
-# yywdjango
-# yywdjango
-# yywdjango
+# 介绍 
+
+这是我的Django学习项目，多多包涵!
