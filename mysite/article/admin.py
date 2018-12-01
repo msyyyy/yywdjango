@@ -2,4 +2,9 @@ from django.contrib import admin
 from .models import Article
 
 # Register your models here.
-admin.site.register(Article)
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin): #显示title和content
+    list_display = ("id","title","content","author","is_deleted","created_time","last_update_time")
+    ordering =("id",)
+
+#admin.site.register(Article,ArticleAdmin) 
