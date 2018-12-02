@@ -23,6 +23,8 @@ class Blog(models.Model):
         return "<Blog: %s>" % self.title
 
 ```
+
+
 > 2.  blog下admin文件修改
 ```python
 from django.contrib import admin
