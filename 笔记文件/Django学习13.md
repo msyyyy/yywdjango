@@ -94,24 +94,36 @@ def blog_list(request):
 ```html
 <div>
     <ul class="pagination">
-        {# 上一页码 #}
+
         <li>
+            <!-- 最前页 -->
+            <a href="?page=1" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+
+            <!--    上一页码
             {% if page_of_blogs.has_previous %}  {# 判断是否有上一页 #}
-                <a href="?page={{ page_of_blogs.previous_page_number }}"  aria-label="Previous">
+                <a href="?page={{ page_of_blogs.previous_page_number }}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             {% else %}
                 <span aria-hidden="true">&laquo;</span>
             {% endif %}
-        
+            -->
         </li>
-        {# 全部页码 #}
-        {% for page_num in page_of_blogs.paginator.page_range %} 
+        <!-- 全部页码 -->
+        {% for page_num in page_of_blogs.paginator.page_range %}  <!-- page_of_blogs.paginator  代表该分页对应的总分页 -->
             <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
         {% endfor %}    
 
-        {# 下一页码 #}
+        
         <li>
+            <!-- 最末页 -->
+            <a href="?page={{ page_of_blogs.paginator.num_pages }}" aria-label="Previous">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+
+            <!--  下一页码
             {% if page_of_blogs.has_next %} 
                 <a href="?page={{ page_of_blogs.next_page_number }}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
@@ -119,7 +131,7 @@ def blog_list(request):
             {% else %}
                 <span aria-hidden="true">&raquo;</span>
             {% endif %}
-        
+            -->
         </li>
     </ul>
 </div>
