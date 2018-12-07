@@ -1,9 +1,18 @@
 from django.shortcuts import render_to_response,get_object_or_404
+from django.core.paginator import Paginator #分页器
 from .models import Blog,BlogType
 
+
 def blog_list(request):
+
+    blogs_all_list=Blog.objects.all()
+    paginator = Paginator(blogs_all_list,10) #每10页进行分页
+    page_num = request.GET.get('page',1) #获取页码参数（GET请求）
+    page_of_blogs = paginator.get_page(page_num) #如果得到的是非法页码自动返回 1
+
     context = {}
-    context['blogs'] = Blog.objects.all()
+    context['blogs'] = page_of_blogs.object_list
+    context['page_of_blogs'] = page_of_blogs  #传入分页信息
     context['blog_types'] = BlogType.objects.all()
     return render_to_response('blog/blog_list.html',context)
 
