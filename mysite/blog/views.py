@@ -67,7 +67,14 @@ def blogs_with_date(request,year,month):
 def blog_detail(request,blog_pk):
     context = {}
     blog = get_object_or_404(Blog,pk=blog_pk)
+    if not request.COOKIES.get('blog_%s_read' % blog_pk):
+        blog.read_num +=1
+        blog.save()
+        
     context['previous_blog'] = Blog.objects.filter(created_time__gt=blog.created_time).last() # 获取上一篇博客
     context['next_blog'] = Blog.objects.filter(created_time__lt=blog.created_time).first()  # 获取下一篇博客 
     context['blog'] = blog
-    return render_to_response('blog/blog_detail.html',context)
+    response = render_to_response('blog/blog_detail.html',context) # 响应
+    response.set_cookie('blog_%s_read' % blog_pk,'true' ) # 键值  权值   max_age有效期持续时间   expires 有效期到多久为止,
+    #有了expires 则 max_age 无效 如果两个都不设置  那么打开浏览器时一直有效 关闭浏览器失效 
+    return response
