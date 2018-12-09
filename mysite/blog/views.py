@@ -2,6 +2,7 @@ from django.shortcuts import render_to_response,get_object_or_404
 from django.core.paginator import Paginator #分页器
 from .models import Blog,BlogType
 from django.conf import settings
+from django.db.models import Count
 
 def get_blog_list_common_date(request,blogs_all_list):
     paginator = Paginator(blogs_all_list,settings.EACH_PAGE_BLOGS_NUMBER) # 每几篇文章进行分页
@@ -21,13 +22,24 @@ def get_blog_list_common_date(request,blogs_all_list):
     if page_range[-1] !=paginator.num_pages:     # 如果page_range没有最后页码 
         page_range.append (paginator.num_pages)
 
+    # 获得日期归档对应的博客数量
+    blog_dates =  Blog.objects.dates('created_time','month',order="DESC")
+    blog_dates_dict = {}   # 字典,相当于c++map
+    for blog_date in blog_dates:
+        #找出所有存在的年月 的博客数量
+        blog_count = Blog.objects.filter(created_time__year=blog_date.year,
+                                         created_time__month=blog_date.month).count()
+        blog_dates_dict[blog_date] = blog_count  # 将年月和博客数量对应
+
     context = {}
     context['blogs'] = page_of_blogs.object_list
     context['page_of_blogs'] = page_of_blogs  # 传入分页信息
     context['page_range'] = page_range
+    # 获取博客分类的对应博客数目
+    # context['blog_types'] = BlogType.objects.annotate( blog_count = Count('blog')) # SQL语句等访问时再执行  Blog通过外键相关连了BlogType
     context['blog_types'] = BlogType.objects.all()
-    context['blog_dates'] = Blog.objects.dates('created_time','month',order="DESC") #字段  类型  排序
-    # mouth 返回的是year和month    DESC
+
+    context['blog_dates'] = blog_dates_dict 
     return context
 
 def blog_list(request):

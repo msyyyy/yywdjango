@@ -6,6 +6,8 @@ class BlogType (models.Model):
 
     def __str__ (self):  #让文章选择分类时能看到分类名
         return self.type_name
+    def blog_count(self): 
+        return self.blog_set.count()  # blog_set 反向获取被关联外键的model（模型名称小写加_set）
 
 class Blog(models.Model):
     title = models.CharField(max_length=50)
