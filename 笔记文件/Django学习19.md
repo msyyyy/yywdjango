@@ -129,6 +129,10 @@ class ReadNumAdmain(admin.ModelAdmin):
  blog = Blog.objects.first()
  rn = ReadNum.objects.filter(content_type = ct ,object_id = blog.pk)[0]  # 获得所有关联到Blog ， id值= blog.pk 这个blog的 ReadNum ，然后取出第一个
  rn.read_num    # 查看这一条记录的阅读次数
+
+
+ filter 是选出所有包含条件的 如果没有获得 []
+ get 是选出一个满足条件的  如果没有或者 有两个以上会报错
 ```
 
 ### 2. 完成添加app到settings 后 
