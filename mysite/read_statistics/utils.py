@@ -24,9 +24,11 @@ def get_seven_days_read_date(content_type):
     today = timezone.now().date()
     # today - datetime.timedelta(days=1)   # 现在时间 减去固定时间差量（一天）  得到昨天
     read_nums = []
+    dates = []
     for i in range(7,0,-1):  # 获得今天以前前7天的数据
         date = today - datetime.timedelta(days=i) 
         read_details = ReadDetail.objects.filter(content_type=content_type,date=date) # 得到所有该天被阅读的类型的次数
         result = read_details.aggregate(read_num_sum=Sum('read_num')) # 得到每天所有被访问的类型访问次数和 result['read_num_sum']是求出的和
         read_nums.append(result['read_num_sum'] or 0) # 如果没有数据 那么取和为 0 
-    return read_nums
+        dates.append(date.strftime('%m/%d')) # 把date变成字符串(格式化) 然后在添加到dates中 
+    return dates,read_nums

@@ -117,5 +117,113 @@ def home(request):
 
 现在能得到前7天的数据了 但是只有数据 太丑 
 
+> 用图表显示数据 Higncharts
+
+> 1. 要显示日期先传入
+`utils.py`
+```python
+def get_seven_days_read_date(content_type):
+    today = timezone.now().date()
+    # today - datetime.timedelta(days=1)   # 现在时间 减去固定时间差量（一天）  得到昨天
+    read_nums = []
+    dates = []
+    for i in range(7,0,-1):  # 获得今天以前前7天的数据
+        date = today - datetime.timedelta(days=i) 
+        read_details = ReadDetail.objects.filter(content_type=content_type,date=date) # 得到所有该天被阅读的类型的次数
+        result = read_details.aggregate(read_num_sum=Sum('read_num')) # 得到每天所有被访问的类型访问次数和 result['read_num_sum']是求出的和
+        read_nums.append(result['read_num_sum'] or 0) # 如果没有数据 那么取和为 0 
+        dates.append(date.strftime('%m/%d')) # 把date变成字符串(格式化) 然后在添加到dates中 
+    return dates,read_nums
+```
+`views.py`
+
+```python
+def home(request):
+    blog_content_type = ContentType.objects.get_for_model(Blog) # 获得关联到Blog类型的 ContentType实例
+    dates,read_nums = get_seven_days_read_date(blog_content_type)    # 获得前七天博客阅读的list
+    context={}
+    context['read_nums'] = read_nums
+    context['dates'] = dates
+    return render_to_response('home.html',context)
+```
+
+> 2. 用Higncharts建立图标模型  
+`home.thml`
+```html
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+        我的网站|首页
+{% endblock %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script> 从Higncharts官网引用
+{% endblock %}
+
+{% block nav_home_active %}
+    active
+{%endblock%}
 
 
+{% block content %}
+    <h3 class="home-content"> 欢迎访问我的网站~~</h3>
+    <!-- 图表容器 DOM -->
+    <div id="container"></div>
+    <script>
+        // 图表配置
+        var options = {
+            chart: {
+                type: 'line'                          //指定图表的类型，默认是折线图（line）
+            },
+            title: {
+                text: null                // 标题
+            },
+            xAxis: {
+                categories: {{ dates|safe }},// x 轴分类 ,输出日期信息 
+                 tickmarkPlacement: 'on',  
+            },
+            yAxis: {
+                title: {
+                    text: null               // y 轴标题
+                },
+                labels:{ enabled: false },  // 去掉y轴每一行的数据显示
+                gridLineDashStyle: 'Dash', // y轴背景的是先变虚线
+            },
+            series: [{                              // 数据列
+                name: '阅读量',                        // 数据列名
+                data: {{ read_nums }},              // 数据                    
+            }],
+            plotOptions: {                  // 数据标签 能直接把每个数据显示在点旁边
+                line: {
+                    dataLabels: {
+                        enabled: true
+                    }
+                }
+            },
+            legend: { enabled: false }, //去掉图例
+            credits: { enabled: false }, //去掉版权信息
+        };
+        // 图表初始化函数
+        var chart = Highcharts.chart('container', options);
+    </script>
+{% endblock %}
+
+```
+
+css细节优化 `home.css`
+```css
+h3.home-content {
+    font-size: 222%;
+    text-align: center;
+    margin-top: 4em;
+    margin-bottom: 2em;
+}
+div#container {   图表
+    margin: 0 auto;
+    height: 20em;
+    min-width: 20em;  自动显示 最小20最大30
+    max-width: 30em;
+}
+```
