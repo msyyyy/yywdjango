@@ -44,5 +44,23 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                <div>提交评论区
+                    {% if user.is_authenticated %}
+                        已登录
+                    {% else %}
+                        未登录
+                        <form action="{% url 'login' %}" method="POST"> <!--弹出文本框-->
+                            {% csrf_token %}   <!--csrf令牌 安全性-->
+                            <input type="text" name="username"> <!--账号 text是明文-->
+                            <input type="password" name="password"> <!--密码 password 是密文-->
+                            <input type="submit" value="登录"> <!--submit是按钮  发生数据至上面action的网址-->
+                        </form>
+                    {% endif %}
+                </div>
+                <div>评论列表区</div>
+            </div>
+        </div>
     </div>
 {% endblock %}
