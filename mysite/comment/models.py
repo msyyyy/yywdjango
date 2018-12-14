@@ -11,3 +11,6 @@ class Comment(models.Model):
     text = models.TextField() # 评论内容
     comment_time = models.DateTimeField(auto_now_add=True) # 评论时间
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING) # 评论者
+
+    class Meta: # 排序设置 倒叙
+        ordering = ['-comment_time']

@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models import Sum 
 from django.core.cache import cache # 缓存
 from django.contrib import auth # 登录
+from django.urls import reverse # 反向通过别名得到网址
 from read_statistics.utils import get_seven_days_read_date,get_today_hot_data, get_yesterday_hot_data
 from blog.models import Blog
 
@@ -42,8 +43,9 @@ def login(request): # 登录
     username = request.POST.get('username','') # 传进来POST是字典形式 如果获取不到username 设置为''(空)
     password = request.POST.get('password','')
     user = auth.authenticate(request, username=username,password=password) # 验证数据库中是否有对应账号密码
+    referer =  request.META.get('HTTP_REFERER', reverse('home')) # 获取是从哪个网址跳转过来的 如果获取不到 那么返回首页(通过别名反向得到链接)
     if user is not None: 
         auth.login(request, user) # 存在 登录,有人说login这个会自动提醒如果不正确
-        return redirect('/') # 跳转到首页
+        return redirect(referer) # 跳转到之前访问的那一页
     else:
-        return render(request, 'error.html',{'message':'用户名或密码不正确'}) # 验证失败 跳转到错误页面
+        return render(request, 'error.html',{'message':'用户名或密码不正确','redirect_to': referer }) # 验证失败 跳转到错误页面

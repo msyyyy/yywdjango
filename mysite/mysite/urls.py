@@ -25,6 +25,7 @@ urlpatterns = [
     path('ckeditor',include('ckeditor_uploader.urls')),
     path('blog/',include('blog.urls')),
     path('login/',views.login, name='login'), # 登录界面
+    path('comment/',include('comment.urls')),
 
 ]
 
