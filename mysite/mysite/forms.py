@@ -2,6 +2,7 @@ from django import  forms
 from django.contrib import auth
 from django.contrib.auth.models import User
 
+# 登录
 class LoginForm(forms.Form):
     username = forms.CharField(label='用户名',
                                widget=forms.TextInput(

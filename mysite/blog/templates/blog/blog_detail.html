@@ -51,13 +51,8 @@
                     {% if user.is_authenticated %}
                         <form action="{% url 'update_comment' %}" method="POST" style="overflow:hidden"> <!--发布评论 发送给提交页面-->
                             {% csrf_token %} 
-                            <div class="from-group">
-                                <label for="comment_text">{{ user.username }} 欢迎评论~~</label>
-                                <textarea name="text" id="comment_text" class="form-control" rows="4"></textarea><!--评论框 允许输入换行-->
-                            </div>
-                            
-                            <input type="hidden" name= "object_id" value="{{ blog.pk }}"> <!--博客id hidden 表示隐藏-->
-                            <input type="hidden" name="content_type" value="blog"> <!--文章类型是博客-->
+                            <label>{{ user.username }} 欢迎评论~~</label>
+                            {{ comment_form }}
                             <input type="submit" value="评论" class="btn btn-primary" style="float:right">
                         </form>
                     {% else %}
