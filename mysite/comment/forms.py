@@ -22,8 +22,8 @@ class CommentForm(forms.Form):
             raise forms.ValidationError('用户尚未登录')
             
         # 评论对象验证 评论对象不存在不能评论
-        content_type = self.clean_data['content_type']
-        object_id = self.clean_data['object_id']
+        content_type = self.cleaned_data['content_type']
+        object_id = self.cleaned_data['object_id']
         try:
             model_class = ContentType.objects.get(model=content_type).model_class() # 得到该文章类型的具体模型 比如这里model_class 可能为Blog
             model_obj = model_class.objects.get(pk=object_id)   # 找到具体哪一篇文章
