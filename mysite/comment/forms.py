@@ -1,14 +1,15 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import ObjectDoesNotExist 
+from ckeditor.widgets import CKEditorWidget
 
 class CommentForm(forms.Form):
     # widget=forms.HiddenInput 隐藏不显示
     object_id = forms.IntegerField(widget=forms.HiddenInput)
-    content_type = forms.CharField(widget=forms.HiddenInput) 
-    # Textarea 能输入多行字符
-    text = forms.CharField(widget=forms.Textarea)
-
+    content_type = forms.CharField(widget=forms.HiddenInput)
+    # text 为自定义的富文本编辑框  自定义错误返回
+    text = forms.CharField(widget=CKEditorWidget(config_name='comment_ckeditor'),
+                            error_messages={'required':'评论内容不能为空'}) 
     def __init__(self, *args, **kwargs): # 之前实例化过程中上传了一个user，这边接收 
         if 'user' in kwargs: # 存在user
             self.user = kwargs.pop('user') # 取出并抛弃
