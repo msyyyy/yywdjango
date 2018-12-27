@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import ObjectDoesNotExist 
 from ckeditor.widgets import CKEditorWidget
+from .models import Comment
 
 class CommentForm(forms.Form):
     # widget=forms.HiddenInput 隐藏不显示
@@ -10,6 +11,9 @@ class CommentForm(forms.Form):
     # text 为自定义的富文本编辑框  自定义错误返回
     text = forms.CharField(widget=CKEditorWidget(config_name='comment_ckeditor'),
                             error_messages={'required':'评论内容不能为空'}) 
+    # 回复对应的id值
+    reply_comment_id = forms.IntegerField(widget=forms.HiddenInput(attrs={'id':'reply_comment_id' }))
+
     def __init__(self, *args, **kwargs): # 之前实例化过程中上传了一个user，这边接收 
         if 'user' in kwargs: # 存在user
             self.user = kwargs.pop('user') # 取出并抛弃
@@ -33,3 +37,16 @@ class CommentForm(forms.Form):
             raise forms.ValidationError('评论对象不存在')
         
         return self.cleaned_data
+
+    # 回复的对象 0 代表初始值说明他是评论文章 否则回复评论
+    def clean_reply_comment_id(self):
+        reply_comment_id = self.cleaned_data['reply_comment_id']
+        if reply_comment_id < 0:
+            raise forms.ValidationError('回复出错')
+        elif reply_comment_id == 0:
+            self.cleaned_data['parent'] = None
+        elif Comment.objects.filter(pk=reply_comment_id).exists():
+            self.cleaned_data['parent'] = Comment.objects.get(pk=reply_comment_id)
+        else:
+            raise forms.ValidationError('回复出错')
+        return reply_comment_id

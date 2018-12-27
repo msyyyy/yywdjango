@@ -16,6 +16,12 @@ def update_comment(request): # 提交评论
         comment.user = comment_form.cleaned_data['user']
         comment.text = comment_form.cleaned_data['text']
         comment.content_object = comment_form.cleaned_data['content_object']
+
+        parent = comment_form.cleaned_data['parent']
+        if not parent is None: # 这说明他评论的不是文章而是评论
+            comment.root = parent.root if not parent.root is None else parent # 顶级评论的root也为None,如果他评论对象是顶级评论 那么root是他的评论对象 否则root为顶级对象
+            comment.parent = parent 
+            comment.reply_to = parent.user
         comment.save()
         
         # 返回数据
@@ -23,6 +29,12 @@ def update_comment(request): # 提交评论
         data['username'] = comment.user.username
         data['comment_time'] = comment.comment_time.strftime('%Y-%m-%d %H:%M:%S') # 字符串化时间
         data['text'] = comment.text
+        if not parent is None:
+            data['reply_to'] = comment.reply_to.username
+        else:
+            data['reply_to'] = ''
+        data['pk'] = comment.pk
+        data['root_pk'] = comment.root.pk if not comment.root is None else ''
     else:
         # return render(request, 'error.html',{'message':comment_form.errors,'redirect_to': referer })
         data['status'] = 'ERROR'

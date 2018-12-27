@@ -74,14 +74,14 @@ def blog_detail(request,blog_pk):
     blog = get_object_or_404(Blog,pk=blog_pk)
     read_cookie_key = read_statistics_once_read(request,blog) 
     blog_content_type = ContentType.objects.get_for_model(blog) # 获取与Blog相关联的cotenttype
-    comments = Comment.objects.filter(content_type=blog_content_type,object_id=blog.pk) # 获取对应该博客的评论
+    comments = Comment.objects.filter(content_type=blog_content_type,object_id=blog.pk,parent=None) # 获取对应该博客的评论，获得一级评论
 
     context = {}    
     context['previous_blog'] = Blog.objects.filter(created_time__gt=blog.created_time).last() # 获取上一篇博客
     context['next_blog'] = Blog.objects.filter(created_time__lt=blog.created_time).first()  # 获取下一篇博客 
     context['blog'] = blog
-    context['comments'] = comments
-    context['comment_form'] = CommentForm(initial={'content_type':blog_content_type.model,'object_id': blog_pk})#  提交评论 传入字典给评论的content_type和object_id赋初值
+    context['comments'] = comments.order_by('-comment_time') # 倒叙排序
+    context['comment_form'] = CommentForm(initial={'content_type':blog_content_type.model,'object_id': blog_pk,'reply_comment_id': 0})#  提交评论 传入字典给评论的content_type和object_id赋初值
     response = render( request,'blog/blog_detail.html',context) # 响应
     response.set_cookie(read_cookie_key,'true' ) # 键值  权值   max_age有效期持续时间   expires 有效期到多久为止,
     #有了expires 则 max_age 无效 如果两个都不设置  那么打开浏览器时一直有效 关闭浏览器失效 

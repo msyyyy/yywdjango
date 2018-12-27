@@ -21,6 +21,6 @@ class Comment(models.Model): # 评论
     def __str__(self):
         return self.text
     
-    class Meta: # 排序设置 倒叙
-        ordering = ['-comment_time']
+    class Meta: # 排序设置 正序
+        ordering = ['comment_time']
 
