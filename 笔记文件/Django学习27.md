@@ -34,8 +34,37 @@ def get_comment_count(obj): # 数量统计
 
 1. ajax 返回的日期
 
+时间戳 timestamp
+`comment/views.py`
+```python
+ data['comment_time'] = comment.comment_time.timestamp() # 时间戳
+```
+`blog_detail.html`
+```js
+  function numFormat(num){ //控制格式 保证 3 输出为 03 
+            return ('00' + num).substr(-2);
+        }
+        function timeFormat(timestamp){ // 获取时间 时间戳转换为时间
+            var datetime = new Date(timestamp * 1000); // 得到时间 以ms为单位转换为s ×1000
+            var year = datetime.getFullYear();
+            var month = numFormat(datetime.getMonth()+1); //得到月份从0开始+1 
+            var day = numFormat(datetime.getDate());
+            var hour = numFormat(datetime.getHours());
+            var minute = numFormat(datetime.getMinutes());
+            var second = numFormat(datetime.getSeconds());
+            return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+            
+        }
+
+    timeFormat(data['comment_time'])
+```
 2. css样式调整
 
 3. 级联删除
+
+DO_NOTHING  可能会对数据完整性产生影响
+修改 models.DO_NOTHING 为 models.CASCADE
+删除user后会删除关联的comment  
+删除顶级评论 也会删除 相连回复
 
 3. django-ckeditor

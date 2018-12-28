@@ -57,7 +57,7 @@
                         <form id= "comment_form" action="{% url 'update_comment' %}" method="POST" style="overflow:hidden"> <!--发布评论 发送给提交页面-->
                             <label>{{ user.username }} 欢迎评论~~</label>
                             <div id="reply_content_container" style="display:none;">
-                                <p>回复: </p>
+                                <p id="reply_title">回复: </p>
                                 <div id="reply_content"></div>
                             </div>
                             {% csrf_token %}
@@ -116,6 +116,34 @@
 
 {% block script_extends %}
     <script type="text/javascript"> 
+        function reply(reply_comment_id){
+            //设置值
+            $('#reply_comment_id').val(reply_comment_id); //修改reply_comment_id的值
+            var html =$("#comment_" + reply_comment_id).html(); // 选择器 得到html 然后获得其文章内容
+            $('#reply_content').html(html);
+            $('#reply_content_container').show(); //在上面显示出要回复对象的内容
+
+            // 页面回滚到提交评论那边
+            $('html').animate({scrollTop:$('#comment_form').offset().top - 60 },300,function(){
+                CKEDITOR.instances['id_text'].focus();
+
+            }); 
+            
+        }
+        function numFormat(num){ //控制格式 保证 3 输出为 03 
+            return ('00' + num).substr(-2);
+        }
+        function timeFormat(timestamp){ // 获取时间 时间戳转换为时间
+            var datetime = new Date(timestamp * 1000); // 得到时间 以ms为单位转换为s ×1000
+            var year = datetime.getFullYear();
+            var month = numFormat(datetime.getMonth()+1); //得到月份从0开始+1 
+            var day = numFormat(datetime.getDate());
+            var hour = numFormat(datetime.getHours());
+            var minute = numFormat(datetime.getMinutes());
+            var second = numFormat(datetime.getSeconds());
+            return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+            
+        }
         $("#comment_form").submit(function(){ //选择出了id 为comment_form 的标签
             $("#comment_error").text(''); //清掉错误提示
             // 判断是否为空 若为空则不提交 trim把取到的内容换行和空格都忽略
@@ -137,11 +165,11 @@
                     if(data['status']=="SUCCESS"){
                         if($('#reply_comment_id').val()=='0'){
                             // 插入评论
-                            var comment_html = '<div id="root_' + data['pk'] + '" class="comment"><span>' + data['username'] + '</span><span> (' + data['comment_time'] + ')：</span><div id="comment_' + data['pk'] + '">' + data['text'] + '</div><a href="javascript:reply(' + data['pk'] + ');">回复</a></div>';
+                            var comment_html = '<div id="root_' + data['pk'] + '" class="comment"><span>' + data['username'] + '</span><span> (' + timeFormat(data['comment_time']) + ')：</span><div id="comment_' + data['pk'] + '">' + data['text'] + '</div><a href="javascript:reply(' + data['pk'] + ');">回复</a></div>';
                             $("#comment_list").prepend(comment_html);
                         }else{ 
                             // 插入回复
-                            var reply_html ='<div class="reply"><span>' + data['username'] + '</span><span> (' + data['comment_time'] + ')</span><span> 回复 </span><span>' + data['reply_to'] + '：</span><div id="comment_' + data['pk'] + '">' + data['text'] + '</div><a href="javascript:reply(' + data['pk'] + ');">回复</a></div>';
+                            var reply_html ='<div class="reply"><span>' + data['username'] + '</span><span> (' + timeFormat(data['comment_time']) + ')</span><span> 回复 </span><span>' + data['reply_to'] + '：</span><div id="comment_' + data['pk'] + '">' + data['text'] + '</div><a href="javascript:reply(' + data['pk'] + ');">回复</a></div>';
                             $("#root_" + data['root_pk']).append(reply_html);
                         }
                         
@@ -150,6 +178,7 @@
                         $('#reply_content_container').hide(); // 隐藏当前要评论的对象
                         $('#reply_comment_id').val('0');
                         $('#no_comment').remove();//去掉暂无评论
+                        $("#comment_error").text('评论成功');
                     }else{
                         // 显示错误信息
                         $("#comment_error").text(data['message']);
@@ -161,20 +190,7 @@
             });
             return false;
         })
-        function reply(reply_comment_id){
-            //设置值
-            $('#reply_comment_id').val(reply_comment_id); //修改reply_comment_id的值
-            var html =$("#comment_" + reply_comment_id).html(); // 选择器 得到html 然后获得其文章内容
-            $('#reply_content').html(html);
-            $('#reply_content_container').show(); //在上面显示出要回复对象的内容
-
-            // 页面回滚到提交评论那边
-            $('html').animate({scrollTop:$('#comment_form').offset().top - 60 },300,function(){
-                CKEDITOR.instances['id_text'].focus();
-
-            }); 
-            
-        }
+        
     </script>
 
 {% endblock %}

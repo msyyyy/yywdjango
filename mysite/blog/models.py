@@ -14,9 +14,9 @@ class BlogType (models.Model):
 
 class Blog(models.Model,ReadNumExpandMethod):
     title = models.CharField(max_length=50)
-    blog_type = models.ForeignKey(BlogType,on_delete=models.DO_NOTHING) # 删除博客对博客类型无影响  多对一
+    blog_type = models.ForeignKey(BlogType,on_delete=models.CASCADE) # 删除博客对博客类型无影响  多对一
     content = RichTextUploadingField()
-    author = models.ForeignKey(User,on_delete=models.DO_NOTHING)
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
     read_details = GenericRelation(ReadDetail) # 反向关联到ReadDetail    关联以后直接 blog.read_details.all()就能查看该博客所有readdetail
     created_time = models.DateTimeField(auto_now_add=True)
     last_updated_time = models.DateTimeField(auto_now=True)
