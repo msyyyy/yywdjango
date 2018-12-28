@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 
 class Comment(models.Model): # 评论
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE) # models.CASCADE 删除阅读次数会删除博客   DO_NOTHING  删除阅读次数对应博客本身无影响
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE) # models.CASCADE 删除博客会删除阅读数 
     object_id = models.PositiveIntegerField()  
     content_object = GenericForeignKey('content_type', 'object_id') # 评论对象
 

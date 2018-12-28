@@ -25,7 +25,8 @@ ul.blog-info-description li{
     margin-right: 1em;
 }
 div.blog-content {
-    text-indent: 2em; 
+    text-indent: 2em;
+    margin-bottom: 2em;
 }
 div.blog-more {
     margin-top: 1em;
@@ -59,4 +60,13 @@ div#reply_content_container {
 p#reply_title {
     border-bottom: 1px dashed #ccc;
     padding-bottom: 0.5em;
+}
+div.like {   /* 点赞图标 */
+    color: #337ab7;
+    cursor: pointer;  /* 可以点击 */
+    display: inline-block;
+    padding: 0.5em 0.3em; /* 上下0.5em 左右0.3em */
+}
+div.like .active { /* 点赞图标被点击后 */
+    color: #f22;
 }

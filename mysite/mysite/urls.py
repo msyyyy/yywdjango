@@ -24,7 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor',include('ckeditor_uploader.urls')),
     path('blog/',include('blog.urls')),
-    path('comment/',include('comment.urls')),
+    path('comment/',include('comment.urls')), # 评论
+    path('likes/',include('likes.urls')), # 点赞
     path('login/',views.login, name='login'), # 登录界面
     path('register/',views.register, name='register'), # 注册
     

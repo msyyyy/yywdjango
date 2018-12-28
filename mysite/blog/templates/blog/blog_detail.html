@@ -27,6 +27,11 @@
                     <li>评论:({% get_comment_count blog %})</li>
                 </ul>
                 <div class="blog-content">{{ blog.content|safe }}</div>
+                <div class="like" onclick=""> <!-- onlick 为点击操作 点击后触发-->
+                    <span class="glyphicon glyphicon-thumbs-up"></span>
+                    <span class="liked-num">0</span>
+                    <span>喜欢</span>
+                </div>
                 <div class="blog-more">
                     <p>上一篇: 
                         {% if previous_blog %}
@@ -190,7 +195,22 @@
             });
             return false;
         })
-        
+        function likeChange(){ //点赞或取消点赞
+            $ajax({ //发送请求
+                url: "{% url 'like_change' %}", // q向哪里发送
+                type: 'GET', // 发送的种类
+                data: {  //发送内容
+
+                },
+                cache: false, //是否有缓存
+                success: function(data){ //请求成功
+
+                },
+                error: function(xhr){ //发生错误
+
+                }
+            });
+        }
     </script>
 
 {% endblock %}
