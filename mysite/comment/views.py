@@ -29,6 +29,7 @@ def update_comment(request): # 提交评论
         data['username'] = comment.user.username
         data['comment_time'] = comment.comment_time.timestamp() # 时间戳
         data['text'] = comment.text
+        data['content_type'] = ContentType.objects.get_for_model(comment).model
         if not parent is None:
             data['reply_to'] = comment.reply_to.username
         else:
