@@ -6,6 +6,7 @@
 
 {% load staticfiles %}
 {% load comment_tags %}
+{% load likes_tags %}
 
 {% block header_extends %} 
     <link rel="stylesheet" href= "{% static 'blog/blog.css' %}" >
@@ -27,9 +28,9 @@
                     <li>评论:({% get_comment_count blog %})</li>
                 </ul>
                 <div class="blog-content">{{ blog.content|safe }}</div>
-                <div class="like" onclick=""> <!-- onlick 为点击操作 点击后触发-->
-                    <span class="glyphicon glyphicon-thumbs-up"></span>
-                    <span class="liked-num">0</span>
+                <div class="like" onclick="likeChange(this,'{% get_content_type blog %}',{{ blog.pk }})"> <!-- onlick 为点击操作 点击后触发-->
+                    <span class="glyphicon glyphicon-thumbs-up {% get_like_status blog %}"></span>
+                    <span class="liked-num">{% get_like_count blog %}</span>
                     <span>喜欢</span>
                 </div>
                 <div class="blog-more">
@@ -92,6 +93,12 @@
                                 <div id="comment_{{ comment.pk }}">
                                     {{ comment.text|safe }}
                                 </div>
+
+                                <div class="like" onclick="likeChange(this,'{% get_content_type comment %}',{{ comment.pk }})"> <!-- onlick 为点击操作 点击后触发-->
+                                    <span class="glyphicon glyphicon-thumbs-up {% get_like_status comment %}"></span>
+                                    <span class="liked-num">{% get_like_count comment %}</span>
+                                </div>
+
                                 <!--调用下面script中reply 方法 传入的是该条评论的id值 -->
                                 <a href="javascript:reply({{ comment.pk }});">回复</a> 
                                 
@@ -104,7 +111,11 @@
                                         <span>{{ reply.reply_to.username }}</span>
                                         <div id="comment_{{ reply.pk }}">
                                                 {{ reply.text|safe }}
-                                            </div>
+                                        </div>
+                                        <div class="like" onclick="likeChange(this,'{% get_content_type reply %}',{{ reply.pk }})"> <!-- onlick 为点击操作 点击后触发-->
+                                            <span class="glyphicon glyphicon-thumbs-up {% get_like_status reply %}"></span>
+                                            <span class="liked-num">{% get_like_count reply %}</span>
+                                        </div>
                                         <a href="javascript:reply({{ reply.pk }});">回复</a>
                                     </div>
                                 {% endfor %}
@@ -149,7 +160,7 @@
             return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
             
         }
-        $("#comment_form").submit(function(){ //选择出了id 为comment_form 的标签
+        $("#comment_form").submit(function(obj,content_type,object_id){ //选择出了id 为comment_form 的标签
             $("#comment_error").text(''); //清掉错误提示
             // 判断是否为空 若为空则不提交 trim把取到的内容换行和空格都忽略
             if (CKEDITOR.instances["id_text"].document.getBody().getText().trim()==''){
@@ -195,19 +206,37 @@
             });
             return false;
         })
-        function likeChange(){ //点赞或取消点赞
-            $ajax({ //发送请求
+        function likeChange(obj, content_type, object_id){ //点赞或取消点赞
+            var is_like = obj.getElementsByClassName('active').length == 0 // 获取是否已经点赞 已经点赞会有active标签
+            $.ajax({ //发送请求
                 url: "{% url 'like_change' %}", // q向哪里发送
                 type: 'GET', // 发送的种类
                 data: {  //发送内容
-
+                        content_type: content_type,
+                        object_id: object_id ,
+                        is_like: is_like
                 },
                 cache: false, //是否有缓存
                 success: function(data){ //请求成功
+                    console.log(data)
+                    if(data['status']=='SUCCESS'){ // 请求成功
+                        // 跟新点赞状态
+                        var element = $(obj.getElementsByClassName('glyphicon')); // 获取glyphicon这一层
+                        if(is_like){ // 如果是要点赞
+                            element.addClass('active'); // 给这层 加上 active 标签 
+                        }else{ // 要取消点赞
+                            element.removeClass('active'); // 移除 active 标签 
+                        }
+                        // 跟新点赞数量
+                        var liked_num = $(obj.getElementsByClassName('liked-num'));
+                        liked_num.text(data['liked_num']); // 跟新点赞数
 
+                    }else{
+                        alert(data['message']);//弹窗 错误信息
+                    }
                 },
                 error: function(xhr){ //发生错误
-
+                    console.log(xhr)
                 }
             });
         }
