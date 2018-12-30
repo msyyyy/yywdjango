@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 
 from .models import Blog,BlogType
 from read_statistics.utils import read_statistics_once_read
-from mysite.forms import LoginForm
 
 
 def get_blog_list_common_date(request,blogs_all_list):
@@ -78,7 +77,6 @@ def blog_detail(request,blog_pk):
     context['previous_blog'] = Blog.objects.filter(created_time__gt=blog.created_time).last() # 获取上一篇博客
     context['next_blog'] = Blog.objects.filter(created_time__lt=blog.created_time).first()  # 获取下一篇博客 
     context['blog'] = blog
-    context['login_form'] = LoginForm()
     response = render( request,'blog/blog_detail.html',context) # 响应
     response.set_cookie(read_cookie_key,'true' ) # 键值  权值   max_age有效期持续时间   expires 有效期到多久为止,
     #有了expires 则 max_age 无效 如果两个都不设置  那么打开浏览器时一直有效 关闭浏览器失效 

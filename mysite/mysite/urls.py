@@ -26,11 +26,7 @@ urlpatterns = [
     path('blog/',include('blog.urls')),
     path('comment/',include('comment.urls')), # 评论
     path('likes/',include('likes.urls')), # 点赞
-    path('login/',views.login, name='login'), # 登录界面
-    path('login_for_medal/',views.login_for_medal, name='login_for_medal'), # 从点赞登录
-    path('register/',views.register, name='register'), # 注册
-    
-
+    path('user/',include('user.urls')), # 用户
 ]
 
 urlpatterns +=static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
