@@ -7,6 +7,7 @@ from django.core.cache import cache # 缓存
 from django.contrib import auth # 登录
 from django.urls import reverse # 反向通过别名得到网址
 from django.contrib.auth.models import User
+from django.http import JsonResponse # 向js返回数据
 
 from read_statistics.utils import get_seven_days_read_date,get_today_hot_data, get_yesterday_hot_data
 from blog.models import Blog
@@ -55,6 +56,19 @@ def login(request): # 登录
     context['login_form'] = login_form
     return render(request,'login.html',context )
 
+def login_for_medal(request): # 按点赞时能登录
+    login_form = LoginForm(request.POST)
+    data = {}
+
+    if login_form.is_valid(): 
+        user = login_form.cleaned_data['user']
+        auth.login(request, user)
+        data['status'] = 'SUCCESS'
+    else:
+        data['status'] = 'ERROR'
+    return JsonResponse(data)
+
+        
 def register(request): # 注册
     if request.method == 'POST':
         reg_form = RegForm(request.POST)
