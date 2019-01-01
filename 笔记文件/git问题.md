@@ -30,3 +30,30 @@ $ git push -u origin master
 ```
 
 ##### 三
+
+## [git 解决 Your local changes to the following files would be overwritten by merge:](https://www.cnblogs.com/daweizhao/p/6087180.html)
+
+## 问题
+
+同一份文件，在你提交时，有人比你更早更新了文件并上传，使你的本地文件并非最新。因此，在你想上传自己修改后的文件时，第一步git pull时，会报如下错误：
+
+```none
+    error: Your local changes to the following files would be overwritten by merge:
+            src/test/resources/application_context.xml
+    Please, commit your changes or stash them before you can merge.
+    Aborting
+```
+
+## 为解决此问题，做如下操作
+
+1. git stash
+   - 隐藏本地修改
+2. git pull
+   - 下载最新代码 
+3. git stash pop
+   - 从Git栈中读取最近一次保存的内容，恢复自己的本地修改
+4. 提示有无冲突
+   - 若有冲突，则解决冲突
+   - 若无，则直接提交 
+     - git add * 
+     - git commit * -m "comments"

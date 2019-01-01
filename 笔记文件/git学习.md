@@ -113,3 +113,17 @@ git branch -d <name>  删除分支
 ```
 
 领先分支如 dev  想要 merge   落后分支master 好像不行
+
+
+
+同一份文件，在你提交时，有人比你更早更新了文件并上传，使你的本地文件并非最新。因此，在你想上传自己修改后的文件时，第一步git pull时，会报错误：
+
+* git stash 隐藏本地修改
+
+- git pull  下载最新代码 
+- git stash pop 从Git栈中读取最近一次保存的内容，恢复自己的本地修改
+- 提示有无冲突
+  - 若有冲突，则解决冲突
+  - 若无，则直接提交 
+    - git add * 
+    - git commit * -m "comments"
